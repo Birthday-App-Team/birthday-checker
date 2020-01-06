@@ -1,4 +1,5 @@
 const moment = require("moment");
+const axios = require("axios");
 
 const mysql = require("mysql");
 
@@ -22,7 +23,23 @@ module.exports.checker = event => {
         data.forEach(person => {
           const birthday = person.date_of_birth;
           if (moment(birthday).format("MM-DD") === moment().format("MM-DD")) {
-            console.log("It's your birthday " + person.name + "!!!");
+            console.log(person.date_of_birth);
+            axios
+              .post(
+                "https://46m3x72wmb.execute-api.eu-west-2.amazonaws.com/dev/send",
+                {
+                  recipient_name: person.name,
+                  recipient_phone_number: person.phone_number,
+                  message: "Happy Birthday!! Have a great day xx",
+                  from_phone_number: "+447506190696"
+                }
+              )
+              .then(response => {
+                console.log("this is response:", response);
+              })
+              .catch(err => {
+                console.log("Error sending text", err);
+              });
           }
         });
         resolve("Checked all people");
